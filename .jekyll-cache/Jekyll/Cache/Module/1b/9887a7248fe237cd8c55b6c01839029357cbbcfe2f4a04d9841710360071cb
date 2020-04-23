@@ -1,4 +1,4 @@
-I"�
+I"K
 
 <div class="masthead">
   <div class="masthead__inner-wrap">
@@ -10,7 +10,15 @@
           
         </a>
         <ul class="visible-links"><li class="masthead__menu-item">
-              <a href="https://mmistakes.github.io/minimal-mistakes/docs/quick-start-guide/">Quick-Start Guide</a>
+              <a href="https://devinlife.com/" >블로그 방문하기</a>
+            </li><li class="masthead__menu-item">
+              <a href="/categories/%EC%9C%A4%EB%8F%99%EC%A3%BC/" >윤동주</a>
+            </li><li class="masthead__menu-item">
+              <a href="/categories/" >Categories</a>
+            </li><li class="masthead__menu-item">
+              <a href="/tags/" >Tags</a>
+            </li><li class="masthead__menu-item">
+              <a href="/about/" >About</a>
             </li></ul>
         
         <button class="greedy-nav__toggle hidden" type="button">

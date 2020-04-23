@@ -21,7 +21,7 @@ title_separator          : "-"
 subtitle                 : # site tagline that appears below site title in masthead
 name                     : "Hyoungwoo Kim"
 description              : "Unity3D Client Developer"
-url                      : "https://hyoungwookim.github.io"
+url                      : <{{ site.url }}{{ site.baseurl }}>
 baseurl                  : # 서브 경로가 있는 경우 기재
 repository               : # GitHub username/repo-name e.g. "mmistakes/minimal-mistakes"
 teaser                   : "/assets/images/profile.png"

@@ -1,4 +1,4 @@
-I"K
+I"h
 
 <div class="masthead">
   <div class="masthead__inner-wrap">
@@ -10,15 +10,15 @@
           
         </a>
         <ul class="visible-links"><li class="masthead__menu-item">
-              <a href="https://devinlife.com/" >블로그 방문하기</a>
+              <a href="https://hyoungwookim.github.io" >홈</a>
             </li><li class="masthead__menu-item">
-              <a href="/categories/%EC%9C%A4%EB%8F%99%EC%A3%BC/" >윤동주</a>
+              <a href="/%EC%86%8C%EA%B0%9C/" >소개</a>
             </li><li class="masthead__menu-item">
-              <a href="/categories/" >Categories</a>
+              <a href="/%EA%B2%BD%EB%A0%A5/" >경력</a>
             </li><li class="masthead__menu-item">
-              <a href="/tags/" >Tags</a>
+              <a href="/categories/%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/" >프로젝트</a>
             </li><li class="masthead__menu-item">
-              <a href="/about/" >About</a>
+              <a href="/categories/" >Category</a>
             </li></ul>
         
         <button class="greedy-nav__toggle hidden" type="button">

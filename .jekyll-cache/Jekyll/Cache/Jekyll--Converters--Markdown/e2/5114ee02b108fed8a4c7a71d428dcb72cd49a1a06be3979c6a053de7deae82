@@ -1,0 +1,95 @@
+I"�7<h3 id="매인-개발">매인 개발</h3>
+<h3 id="주요-기능">주요 기능</h3>
+<ul>
+  <li>Vuforia sdk를 이용한 전집 책 표지 인식 AR기능 구현
+    <div class="language-c# highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">void</span> <span class="nf">MoveScene</span><span class="p">()</span>
+<span class="p">{</span>
+  <span class="kt">string</span><span class="p">[]</span> <span class="n">numString</span> <span class="p">=</span> <span class="k">null</span><span class="p">;</span>
+
+  <span class="n">numString</span> <span class="p">=</span> <span class="n">mTrackableBehaviour</span><span class="p">.</span><span class="n">TrackableName</span><span class="p">.</span><span class="nf">Split</span><span class="p">(</span><span class="sc">'_'</span><span class="p">);</span>
+
+  <span class="k">if</span> <span class="p">(</span><span class="n">numString</span><span class="p">[</span><span class="m">1</span><span class="p">].</span><span class="nf">Contains</span><span class="p">(</span><span class="s">"item"</span><span class="p">))</span>
+  <span class="p">{</span>
+      <span class="n">SceneLoader</span><span class="p">.</span><span class="n">Instance</span><span class="p">.</span><span class="nf">LoadLevelAsync</span><span class="p">(</span><span class="n">GlobalDefines</span><span class="p">.</span><span class="n">SCENE_ITEMSETTING</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">numString</span><span class="p">[</span><span class="m">1</span><span class="p">].</span><span class="nf">Contains</span><span class="p">(</span><span class="s">"iOS"</span><span class="p">))</span>
+  <span class="p">{</span>
+      <span class="kt">int</span> <span class="n">_nationalNum</span> <span class="p">=</span> <span class="m">0</span><span class="p">;</span>
+      <span class="k">switch</span> <span class="p">(</span><span class="n">numString</span><span class="p">[</span><span class="m">0</span><span class="p">])</span>
+      <span class="p">{</span>
+          <span class="k">case</span> <span class="s">"mongol"</span><span class="p">:</span>
+              <span class="n">_nationalNum</span> <span class="p">=</span> <span class="m">3</span><span class="p">;</span>
+              <span class="k">break</span><span class="p">;</span>
+          <span class="k">case</span> <span class="s">"poland"</span><span class="p">:</span>
+              <span class="n">_nationalNum</span> <span class="p">=</span> <span class="m">36</span><span class="p">;</span>
+              <span class="k">break</span><span class="p">;</span>
+          <span class="k">case</span> <span class="s">"thai"</span><span class="p">:</span>
+              <span class="n">_nationalNum</span> <span class="p">=</span> <span class="m">5</span><span class="p">;</span>
+              <span class="k">break</span><span class="p">;</span>
+      <span class="p">}</span>
+      <span class="n">PlayerPrefsManager</span><span class="p">.</span><span class="nf">SetInt</span><span class="p">(</span><span class="n">GlobalDefines</span><span class="p">.</span><span class="n">PREF_NATIONALSELECT</span><span class="p">,</span> <span class="n">_nationalNum</span><span class="p">);</span>
+      <span class="n">ObjectManager</span><span class="p">.</span><span class="n">Instance</span><span class="p">.</span><span class="nf">InitNational</span><span class="p">();</span>
+      <span class="n">SceneLoader</span><span class="p">.</span><span class="n">Instance</span><span class="p">.</span><span class="nf">LoadLevelAsync</span><span class="p">(</span><span class="n">GlobalDefines</span><span class="p">.</span><span class="n">SCENE_ARQUIZ</span><span class="p">);</span>
+
+  <span class="p">}</span>
+  <span class="k">else</span>
+  <span class="p">{</span>
+      <span class="n">PlayerPrefsManager</span><span class="p">.</span><span class="nf">SetInt</span><span class="p">(</span><span class="n">GlobalDefines</span><span class="p">.</span><span class="n">PREF_NATIONALSELECT</span><span class="p">,</span> <span class="kt">int</span><span class="p">.</span><span class="nf">Parse</span><span class="p">(</span><span class="n">numString</span><span class="p">[</span><span class="m">1</span><span class="p">]));</span>
+      <span class="n">ObjectManager</span><span class="p">.</span><span class="n">Instance</span><span class="p">.</span><span class="nf">InitNational</span><span class="p">();</span>
+      <span class="n">SceneLoader</span><span class="p">.</span><span class="n">Instance</span><span class="p">.</span><span class="nf">LoadLevelAsync</span><span class="p">(</span><span class="n">GlobalDefines</span><span class="p">.</span><span class="n">SCENE_ARQUIZ</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>    </div>
+  </li>
+  <li>자이로센서 및 가속도센서 기능을 이용한 3D 오브젝트 360 둘러보기 구현
+    <div class="language-c# highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span> <span class="p">(</span><span class="n">m_PlayerState</span> <span class="p">==</span> <span class="n">PlayerState</span><span class="p">.</span><span class="n">MOVE</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span><span class="p">(!</span><span class="n">isGyro</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">//Check count touches</span>
+      <span class="k">if</span> <span class="p">(</span><span class="n">Input</span><span class="p">.</span><span class="n">touchCount</span> <span class="p">&gt;</span> <span class="m">0</span><span class="p">)</span> <span class="p">{</span>
+          <span class="c1">//Touch began, save position</span>
+          <span class="k">if</span> <span class="p">(</span><span class="n">Input</span><span class="p">.</span><span class="nf">GetTouch</span> <span class="p">(</span><span class="m">0</span><span class="p">).</span><span class="n">phase</span> <span class="p">==</span> <span class="n">TouchPhase</span><span class="p">.</span><span class="n">Began</span><span class="p">)</span> <span class="p">{</span>
+              <span class="n">firstpoint</span> <span class="p">=</span> <span class="n">Input</span><span class="p">.</span><span class="nf">GetTouch</span> <span class="p">(</span><span class="m">0</span><span class="p">).</span><span class="n">position</span><span class="p">;</span>
+              <span class="n">xAngTemp</span> <span class="p">=</span> <span class="n">xAngle</span><span class="p">;</span>
+              <span class="n">yAngTemp</span> <span class="p">=</span> <span class="n">yAngle</span><span class="p">;</span>
+          <span class="p">}</span>
+          <span class="c1">//Move finger by screen</span>
+          <span class="k">if</span> <span class="p">(</span><span class="n">Input</span><span class="p">.</span><span class="nf">GetTouch</span> <span class="p">(</span><span class="m">0</span><span class="p">).</span><span class="n">phase</span> <span class="p">==</span> <span class="n">TouchPhase</span><span class="p">.</span><span class="n">Moved</span><span class="p">)</span> <span class="p">{</span>
+              <span class="n">secondpoint</span> <span class="p">=</span> <span class="n">Input</span><span class="p">.</span><span class="nf">GetTouch</span> <span class="p">(</span><span class="m">0</span><span class="p">).</span><span class="n">position</span><span class="p">;</span>
+              <span class="c1">//Mainly, about rotate camera. For example, for Screen.width rotate on 180 degree</span>
+              <span class="n">xAngle</span> <span class="p">=</span> <span class="n">xAngTemp</span> <span class="p">-</span> <span class="p">(</span><span class="n">secondpoint</span><span class="p">.</span><span class="n">x</span> <span class="p">-</span> <span class="n">firstpoint</span><span class="p">.</span><span class="n">x</span><span class="p">)</span> <span class="p">*</span> <span class="m">180.0f</span> <span class="p">/</span> <span class="n">Screen</span><span class="p">.</span><span class="n">width</span><span class="p">;</span>
+              <span class="n">yAngle</span> <span class="p">=</span> <span class="n">yAngTemp</span> <span class="p">+</span> <span class="p">(</span><span class="n">secondpoint</span><span class="p">.</span><span class="n">y</span> <span class="p">-</span> <span class="n">firstpoint</span><span class="p">.</span><span class="n">y</span><span class="p">)</span> <span class="p">*</span> <span class="m">90.0f</span> <span class="p">/</span> <span class="n">Screen</span><span class="p">.</span><span class="n">height</span><span class="p">;</span>
+
+              <span class="k">if</span> <span class="p">(</span><span class="n">yAngle</span> <span class="p">&gt;=</span> <span class="m">90</span><span class="p">)</span>
+                  <span class="n">yAngle</span> <span class="p">=</span> <span class="m">90</span><span class="p">;</span>
+              <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">yAngle</span> <span class="p">&lt;=</span> <span class="p">-</span><span class="m">90</span><span class="p">)</span>
+                  <span class="n">yAngle</span> <span class="p">=</span> <span class="p">-</span><span class="m">90</span><span class="p">;</span>
+
+              <span class="c1">//Rotate camera</span>
+              <span class="k">this</span><span class="p">.</span><span class="n">transform</span><span class="p">.</span><span class="n">rotation</span> <span class="p">=</span> <span class="n">Quaternion</span><span class="p">.</span><span class="nf">Euler</span> <span class="p">(</span><span class="n">yAngle</span><span class="p">,</span> <span class="n">xAngle</span><span class="p">,</span> <span class="m">0.0f</span><span class="p">);</span>
+          <span class="p">}</span>
+      <span class="p">}</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="n">Input</span><span class="p">.</span><span class="n">gyro</span><span class="p">.</span><span class="n">enabled</span><span class="p">)</span> <span class="p">{</span>
+          <span class="k">this</span><span class="p">.</span><span class="n">transform</span><span class="p">.</span><span class="n">localRotation</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">Quaternion</span> <span class="p">(</span><span class="n">Input</span><span class="p">.</span><span class="n">gyro</span><span class="p">.</span><span class="n">attitude</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="n">Input</span><span class="p">.</span><span class="n">gyro</span><span class="p">.</span><span class="n">attitude</span><span class="p">.</span><span class="n">y</span><span class="p">,</span> <span class="p">-</span><span class="n">Input</span><span class="p">.</span><span class="n">gyro</span><span class="p">.</span><span class="n">attitude</span><span class="p">.</span><span class="n">z</span><span class="p">,</span> <span class="p">-</span><span class="n">Input</span><span class="p">.</span><span class="n">gyro</span><span class="p">.</span><span class="n">attitude</span><span class="p">.</span><span class="n">w</span><span class="p">);</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+          <span class="c1">// This tilts the axis of the camera like shaking a head yes</span>
+          <span class="n">xAngle</span> <span class="p">=</span> <span class="n">Input</span><span class="p">.</span><span class="n">acceleration</span><span class="p">.</span><span class="n">z</span> <span class="p">*</span> <span class="p">-</span><span class="m">180f</span><span class="p">;</span>
+          <span class="c1">// This tilts like a driving wheel to make it like shaking head no</span>
+          <span class="n">yAngle</span> <span class="p">=</span> <span class="n">Input</span><span class="p">.</span><span class="n">acceleration</span><span class="p">.</span><span class="n">x</span> <span class="p">*</span> <span class="m">350f</span><span class="p">;</span>
+          <span class="c1">//        zRot = 0f;</span>
+          <span class="k">if</span> <span class="p">(</span><span class="n">xAngle</span> <span class="p">&gt;=</span> <span class="m">90</span><span class="p">)</span>
+              <span class="n">xAngle</span> <span class="p">=</span> <span class="m">90</span><span class="p">;</span>
+          <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">xAngle</span> <span class="p">&lt;=</span> <span class="p">-</span><span class="m">90</span><span class="p">)</span>
+              <span class="n">xAngle</span> <span class="p">=</span> <span class="p">-</span><span class="m">90</span><span class="p">;</span>
+            
+          <span class="n">transform</span><span class="p">.</span><span class="n">rotation</span> <span class="p">=</span> <span class="n">Quaternion</span><span class="p">.</span><span class="nf">Lerp</span> <span class="p">(</span><span class="n">transform</span><span class="p">.</span><span class="n">rotation</span><span class="p">,</span> <span class="n">Quaternion</span><span class="p">.</span><span class="nf">Euler</span> <span class="p">(</span><span class="k">new</span> <span class="nf">Vector3</span> <span class="p">(</span><span class="n">xAngle</span><span class="p">,</span> <span class="n">yAngle</span><span class="p">,</span> <span class="m">0</span><span class="p">)),</span> <span class="n">Time</span><span class="p">.</span><span class="n">deltaTime</span> <span class="p">*</span> <span class="m">1</span><span class="p">);</span>
+      <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>    </div>
+  </li>
+  <li>남녀 캐릭터에 따른 옷갈아입히기 기능 구현
+    <div class="language-c# highlighter-rouge"><div class="highlight"><pre class="highlight"><code></code></pre></div>    </div>
+  </li>
+</ul>
+:ET

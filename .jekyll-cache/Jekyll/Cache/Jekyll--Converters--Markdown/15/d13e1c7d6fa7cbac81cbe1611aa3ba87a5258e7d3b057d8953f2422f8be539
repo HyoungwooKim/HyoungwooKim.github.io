@@ -1,0 +1,53 @@
+I"%<h3 id="매인-개발">매인 개발</h3>
+<h3 id="주요-기능">주요 기능</h3>
+<ul>
+  <li>Vuforia sdk를 이용한 전집 책 표지 인식 AR기능 구현
+    <div class="language-c# highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">protected</span> <span class="k">virtual</span> <span class="k">void</span> <span class="nf">OnTrackingFound</span><span class="p">()</span>
+<span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">mTrackableBehaviour</span><span class="p">)</span>
+  <span class="p">{</span>
+      <span class="kt">string</span> <span class="n">temp</span> <span class="p">=</span> <span class="s">"SCENE_"</span> <span class="p">+</span> <span class="k">this</span><span class="p">.</span><span class="n">transform</span><span class="p">.</span><span class="n">gameObject</span><span class="p">.</span><span class="n">name</span><span class="p">;</span>
+      <span class="n">SceneManager</span><span class="p">.</span><span class="n">Instance</span><span class="p">.</span><span class="nf">LoadLevelAsync</span><span class="p">(</span><span class="n">GlobalDefines</span><span class="p">.</span><span class="nf">GetPropValue</span><span class="p">(</span><span class="n">temp</span><span class="p">));</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>    </div>
+  </li>
+  <li>HOTween을 이용한 애니메이션 구현
+    <div class="language-c# highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">void</span> <span class="nf">StartScene</span> <span class="p">()</span>
+<span class="p">{</span>
+  <span class="c1">// Scene이 시작되면 각 bottombar, home button, 그리고 text들의 위치를 정렬 시킨다. ( 연출 효과 )</span>
+  <span class="nf">StartCoroutine</span> <span class="p">(</span><span class="s">"StartSceneCo"</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="n">IEnumerator</span> <span class="nf">StartSceneCo</span> <span class="p">()</span>
+<span class="p">{</span>
+  <span class="n">btnHome</span><span class="p">.</span><span class="n">transform</span><span class="p">.</span><span class="nf">DOLocalMoveX</span><span class="p">(-</span><span class="m">120f</span><span class="p">,</span> <span class="m">0.3f</span><span class="p">).</span><span class="nf">SetEase</span><span class="p">(</span><span class="n">Ease</span><span class="p">.</span><span class="n">OutBack</span><span class="p">).</span><span class="nf">SetRelative</span><span class="p">();</span>
+  <span class="k">yield</span> <span class="k">return</span> <span class="k">new</span> <span class="nf">WaitForSeconds</span><span class="p">(</span><span class="m">0.15f</span><span class="p">);</span>
+
+  <span class="n">bottomBar</span><span class="p">.</span><span class="n">transform</span><span class="p">.</span><span class="nf">DOLocalMoveY</span><span class="p">(</span><span class="m">257f</span><span class="p">,</span> <span class="m">0.3f</span><span class="p">).</span><span class="nf">SetEase</span><span class="p">(</span><span class="n">Ease</span><span class="p">.</span><span class="n">OutBack</span><span class="p">).</span><span class="nf">SetRelative</span><span class="p">();</span>
+  <span class="nf">IconSclae</span> <span class="p">();</span>
+<span class="p">}</span>
+<span class="k">void</span> <span class="nf">IconSclae</span> <span class="p">()</span>
+<span class="p">{</span>
+  <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="p">=</span> <span class="m">0</span><span class="p">;</span> <span class="n">i</span> <span class="p">&lt;</span> <span class="n">icons</span><span class="p">.</span><span class="n">Length</span><span class="p">;</span> <span class="n">i</span><span class="p">++)</span>
+  <span class="p">{</span>
+      <span class="n">texts</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="nf">DOLocalMove</span><span class="p">(</span><span class="n">startPosition</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="m">0.5f</span><span class="p">).</span><span class="nf">SetEase</span><span class="p">(</span><span class="n">Ease</span><span class="p">.</span><span class="n">OutBack</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>    </div>
+  </li>
+  <li>카메라 및 갤러리 기능 네이티브 구현
+    <div class="language-c# highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">void</span> <span class="nf">imageFromCamera</span><span class="p">(</span><span class="n">String</span> <span class="n">callBackGameObjectName</span><span class="p">,</span> <span class="n">String</span> <span class="n">fileName</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">mCallBackGameObjectName</span> <span class="p">=</span> <span class="n">callBackGameObjectName</span><span class="p">;</span>
+  <span class="n">Intent</span> <span class="n">cameraIntent</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">Intent</span><span class="p">(</span><span class="n">unityActivity</span><span class="p">,</span> <span class="n">camera</span><span class="p">.</span><span class="k">class</span><span class="err">);</span>
+  <span class="nc">unityActivity</span><span class="p">.</span><span class="nf">startActivity</span><span class="p">(</span><span class="n">cameraIntent</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="k">public</span> <span class="k">void</span> <span class="nf">imageFromLibrary</span><span class="p">(</span><span class="n">String</span> <span class="n">callBackGameObjectName</span><span class="p">)</span> <span class="p">{</span>
+
+  <span class="n">mCallBackGameObjectName</span> <span class="p">=</span> <span class="n">callBackGameObjectName</span><span class="p">;</span>
+  <span class="n">Intent</span> <span class="n">libraryIntent</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">Intent</span><span class="p">(</span><span class="n">unityActivity</span><span class="p">,</span> <span class="n">gallery</span><span class="p">.</span><span class="k">class</span><span class="err">);</span>
+  <span class="nc">unityActivity</span><span class="p">.</span><span class="nf">startActivity</span><span class="p">(</span><span class="n">libraryIntent</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>    </div>
+  </li>
+</ul>
+:ET

@@ -292,8 +292,6 @@ defaults:
       comments: false
       share: false
       related: false
-      toc_ads: false
-      toc_sticky: false
 
   # _pages
   - scope:

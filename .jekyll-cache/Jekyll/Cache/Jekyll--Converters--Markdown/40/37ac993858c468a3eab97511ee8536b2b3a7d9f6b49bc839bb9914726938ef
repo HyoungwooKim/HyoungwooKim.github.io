@@ -1,0 +1,34 @@
+I"I<h3 id="매인-개발">매인 개발</h3>
+<h3 id="주요-기능">주요 기능</h3>
+<ul>
+  <li>Bluetooth를 이용한 스마트펜 연결 기능 구현
+    <div class="language-c# highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">/// &lt;summary&gt;</span>
+<span class="c1">/// Starts the connect.</span>
+<span class="c1">/// &lt;/summary&gt;</span>
+<span class="c1">/// &lt;param name="deviceName"&gt;Device name.&lt;/param&gt;</span>
+<span class="c1">/// &lt;param name="deviceAddress"&gt;Device address.&lt;/param&gt;</span>
+<span class="c1">/// &lt;param name="isConnectSuccessForPCTest"&gt;If set to &lt;c&gt;true&lt;/c&gt; is connect success for PCT est.&lt;/param&gt;</span>
+<span class="k">public</span> <span class="k">void</span> <span class="nf">StartConnect</span><span class="p">(</span><span class="kt">string</span> <span class="n">deviceName</span><span class="p">,</span> <span class="kt">string</span> <span class="n">deviceAddress</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">isConnectSuccessForPCTest</span> <span class="p">=</span> <span class="k">true</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">Application</span><span class="p">.</span><span class="n">platform</span> <span class="p">==</span> <span class="n">RuntimePlatform</span><span class="p">.</span><span class="n">Android</span><span class="p">)</span>
+  <span class="p">{</span>
+      <span class="n">penManagerObj</span><span class="p">.</span><span class="nf">Call</span><span class="p">(</span><span class="s">"connectPen"</span><span class="p">,</span> <span class="n">deviceName</span><span class="p">,</span> <span class="n">deviceAddress</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="k">else</span> <span class="p">{</span>
+      <span class="n">Debug</span><span class="p">.</span><span class="nf">Log</span><span class="p">(</span><span class="s">"StartConnect-&gt; call StartConnectPC_Coroutine"</span><span class="p">);</span>
+      <span class="nf">StartCoroutine</span><span class="p">(</span><span class="nf">StartConnectPC_Coroutine</span><span class="p">(</span><span class="n">deviceName</span><span class="p">,</span> <span class="n">deviceAddress</span><span class="p">,</span> <span class="n">isConnectSuccessForPCTest</span><span class="p">));</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>    </div>
+  </li>
+  <li>서버 통신을 통해 LMS (Learning Manager System)을 구현
+    <div class="language-c# highlighter-rouge"><div class="highlight"><pre class="highlight"><code></code></pre></div>    </div>
+  </li>
+  <li>AVPro 에셋으로 비디오 스트리밍 기능 구현
+    <div class="language-c# highlighter-rouge"><div class="highlight"><pre class="highlight"><code></code></pre></div>    </div>
+  </li>
+  <li>교원 플랫폼 ‘ALLnG’ sdk 연동 및 로그인 기능 구현
+    <div class="language-c# highlighter-rouge"><div class="highlight"><pre class="highlight"><code></code></pre></div>    </div>
+  </li>
+</ul>
+:ET

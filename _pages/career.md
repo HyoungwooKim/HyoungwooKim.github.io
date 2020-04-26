@@ -1,8 +1,6 @@
 ---
 title: "경력"
 permalink: /경력/
-toc_sticky: true
-toc_ads : true
 layout: single
 ---
 ### 교원 [ 2016.10 ~ 2020.05 ]

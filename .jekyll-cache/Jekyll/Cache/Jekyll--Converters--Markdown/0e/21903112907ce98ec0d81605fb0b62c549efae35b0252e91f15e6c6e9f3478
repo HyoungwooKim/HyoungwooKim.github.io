@@ -1,8 +1,0 @@
-I"<h3 id="컨텐츠-개발">컨텐츠 개발</h3>
-<h3 id="주요-기능">주요 기능</h3>
-<ul>
-  <li>Vuforia sdk를 이용한 전집 책 표지 인식 AR기능 구현</li>
-  <li>AssetBundle을 통한 컨텐츠 다운로드 구현</li>
-  <li>3D 모델링에 TTS ()</li>
-</ul>
-:ET

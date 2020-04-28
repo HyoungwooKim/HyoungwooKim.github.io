@@ -14,7 +14,25 @@ last_modified_at: 2020-04-24T08:06:00-05:00
 
 ### 메인 개발
 ### 주요 기능
-* Vuforia sdk를 이용한 전집 책 표지 인식 AR기능 구현
-* AssetBundle을 통한 컨텐츠 다운로드 구현
+* AVPro를 통한 Video Player 구현
 * Timeline 기능으로 애니메이션 구현
-
+``` c#
+public virtual void StartNextActivity(){
+    i_currActivity++;
+    if(i_currActivity < arr_activities.Length){
+        arr_activities[i_currActivity].StartActivity(this);
+    } else {
+        EndContentsView();
+    }
+}
+public void PlayPlayableAssets(PlayableAsset asset, Action listener){
+    if(obj_director == null){
+        Debug.Log("There is no playable director.");
+    }
+    if(asset != null) {
+        obj_playableListener = listener;
+        obj_director.Play(asset);
+    }
+    else if(listener != null) listener();
+}
+```

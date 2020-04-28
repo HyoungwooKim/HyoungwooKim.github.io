@@ -1,0 +1,28 @@
+I"�
+<h3 id="메인-개발">메인 개발</h3>
+<h3 id="주요-기능">주요 기능</h3>
+<ul>
+  <li>AVPro를 통한 Video Player 구현</li>
+  <li>Timeline 기능으로 애니메이션 구현
+    <div class="language-c# highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">virtual</span> <span class="k">void</span> <span class="nf">StartNextActivity</span><span class="p">(){</span>
+  <span class="n">i_currActivity</span><span class="p">++;</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">i_currActivity</span> <span class="p">&lt;</span> <span class="n">arr_activities</span><span class="p">.</span><span class="n">Length</span><span class="p">){</span>
+      <span class="n">arr_activities</span><span class="p">[</span><span class="n">i_currActivity</span><span class="p">].</span><span class="nf">StartActivity</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="nf">EndContentsView</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+<span class="k">public</span> <span class="k">void</span> <span class="nf">PlayPlayableAssets</span><span class="p">(</span><span class="n">PlayableAsset</span> <span class="n">asset</span><span class="p">,</span> <span class="n">Action</span> <span class="n">listener</span><span class="p">){</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">obj_director</span> <span class="p">==</span> <span class="k">null</span><span class="p">){</span>
+      <span class="n">Debug</span><span class="p">.</span><span class="nf">Log</span><span class="p">(</span><span class="s">"There is no playable director."</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">asset</span> <span class="p">!=</span> <span class="k">null</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">obj_playableListener</span> <span class="p">=</span> <span class="n">listener</span><span class="p">;</span>
+      <span class="n">obj_director</span><span class="p">.</span><span class="nf">Play</span><span class="p">(</span><span class="n">asset</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="n">listener</span> <span class="p">!=</span> <span class="k">null</span><span class="p">)</span> <span class="nf">listener</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div>    </div>
+  </li>
+</ul>
+:ET

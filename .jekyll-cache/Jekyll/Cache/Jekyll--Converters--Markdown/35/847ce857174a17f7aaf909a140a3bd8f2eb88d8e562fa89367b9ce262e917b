@@ -1,0 +1,54 @@
+I"9<h3 id="컨텐츠-개발">컨텐츠 개발</h3>
+<h3 id="주요-기능">주요 기능</h3>
+<ul>
+  <li>AssetBundle을 통한 컨텐츠 다운로드 구현
+    <div class="language-c# highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">IEnumerator</span> <span class="nf">downloadFile</span><span class="p">(</span><span class="n">Action</span> <span class="n">finishListener</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="n">str_downloadURL</span> <span class="p">=</span> <span class="nf">getDownloadURL</span><span class="p">();</span>
+
+  <span class="n">UnityWebRequest</span> <span class="n">www</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">UnityWebRequest</span><span class="p">(</span><span class="n">str_downloadURL</span><span class="p">);</span>
+  <span class="n">www</span><span class="p">.</span><span class="n">downloadHandler</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">DownloadHandlerBuffer</span><span class="p">();</span>
+
+  <span class="n">AsyncOperation</span> <span class="k">async</span> <span class="p">=</span> <span class="n">www</span><span class="p">.</span><span class="nf">SendWebRequest</span><span class="p">();</span>
+  <span class="k">while</span> <span class="p">(!</span><span class="k">async</span><span class="p">.</span><span class="n">isDone</span><span class="p">)</span>
+  <span class="p">{</span>
+      <span class="n">LoadingManager</span><span class="p">.</span><span class="n">Instance</span><span class="p">.</span><span class="nf">UpdateProgress</span><span class="p">(</span><span class="k">async</span><span class="p">.</span><span class="n">progress</span><span class="p">);</span>
+      <span class="k">yield</span> <span class="k">return</span> <span class="k">null</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="k">if</span> <span class="p">(!</span><span class="kt">string</span><span class="p">.</span><span class="nf">IsNullOrEmpty</span><span class="p">(</span><span class="n">www</span><span class="p">.</span><span class="n">error</span><span class="p">))</span>
+  <span class="p">{</span>
+      <span class="n">NetworkingManager</span><span class="p">.</span><span class="n">Instance</span><span class="p">.</span><span class="nf">ShowNetworkDelayPopup</span><span class="p">();</span>
+  <span class="p">}</span>
+
+  <span class="k">if</span> <span class="p">(!</span><span class="n">Directory</span><span class="p">.</span><span class="nf">Exists</span><span class="p">(</span><span class="n">AssetManager</span><span class="p">.</span><span class="nf">GetContentsAssetDirectory</span><span class="p">()))</span>
+  <span class="p">{</span>
+      <span class="n">Debug</span><span class="p">.</span><span class="nf">Log</span><span class="p">(</span><span class="s">"Not exist directory"</span><span class="p">);</span>
+      <span class="n">Directory</span><span class="p">.</span><span class="nf">CreateDirectory</span><span class="p">(</span><span class="n">AssetManager</span><span class="p">.</span><span class="nf">GetContentsAssetDirectory</span><span class="p">());</span>
+  <span class="p">}</span>
+
+  <span class="kt">string</span> <span class="n">zipFilePath</span> <span class="p">=</span> <span class="n">Path</span><span class="p">.</span><span class="nf">Combine</span><span class="p">(</span><span class="n">AssetManager</span><span class="p">.</span><span class="nf">GetContentsAssetDirectory</span><span class="p">(),</span> <span class="s">"contents.zip"</span><span class="p">);</span>
+
+  <span class="n">File</span><span class="p">.</span><span class="nf">WriteAllBytes</span><span class="p">(</span><span class="n">zipFilePath</span><span class="p">,</span> <span class="n">www</span><span class="p">.</span><span class="n">downloadHandler</span><span class="p">.</span><span class="n">data</span><span class="p">);</span>
+
+  <span class="n">www</span><span class="p">.</span><span class="nf">Dispose</span><span class="p">();</span>
+  <span class="n">www</span> <span class="p">=</span> <span class="k">null</span><span class="p">;</span>
+
+  <span class="n">ZipUtil</span><span class="p">.</span><span class="nf">Unzip</span><span class="p">(</span><span class="n">zipFilePath</span><span class="p">,</span> <span class="n">AssetManager</span><span class="p">.</span><span class="nf">GetContentsAssetDirectory</span><span class="p">());</span>
+
+  <span class="n">File</span><span class="p">.</span><span class="nf">Delete</span><span class="p">(</span><span class="n">zipFilePath</span><span class="p">);</span>
+
+  <span class="n">PlayerPrefs</span><span class="p">.</span><span class="nf">SetInt</span><span class="p">(</span><span class="n">BUNDLE_VERSION</span><span class="p">,</span> <span class="n">currentVersion</span><span class="p">);</span>
+
+  <span class="nf">finishListener</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div>    </div>
+  </li>
+  <li>3D 모델링에 따라말하기 기능 SAL-SA 에셋을 이용해 구현
+    <div class="language-c# highlighter-rouge"><div class="highlight"><pre class="highlight"><code></code></pre></div>    </div>
+  </li>
+  <li>Scratch 에셋을 이용한 색칠하기 컨텐츠 구현
+    <div class="language-c# highlighter-rouge"><div class="highlight"><pre class="highlight"><code></code></pre></div>    </div>
+  </li>
+</ul>
+:ET

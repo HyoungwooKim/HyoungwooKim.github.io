@@ -1,0 +1,199 @@
+I"�]<h3 id="컨텐츠-개발">컨텐츠 개발</h3>
+<h3 id="주요-기능">주요 기능</h3>
+<ul>
+  <li>AssetBundle을 통한 컨텐츠 다운로드 구현
+    <div class="language-c# highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">IEnumerator</span> <span class="nf">downloadFile</span><span class="p">(</span><span class="n">Action</span> <span class="n">finishListener</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="n">str_downloadURL</span> <span class="p">=</span> <span class="nf">getDownloadURL</span><span class="p">();</span>
+
+  <span class="n">UnityWebRequest</span> <span class="n">www</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">UnityWebRequest</span><span class="p">(</span><span class="n">str_downloadURL</span><span class="p">);</span>
+  <span class="n">www</span><span class="p">.</span><span class="n">downloadHandler</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">DownloadHandlerBuffer</span><span class="p">();</span>
+
+  <span class="n">AsyncOperation</span> <span class="k">async</span> <span class="p">=</span> <span class="n">www</span><span class="p">.</span><span class="nf">SendWebRequest</span><span class="p">();</span>
+  <span class="k">while</span> <span class="p">(!</span><span class="k">async</span><span class="p">.</span><span class="n">isDone</span><span class="p">)</span>
+  <span class="p">{</span>
+      <span class="n">LoadingManager</span><span class="p">.</span><span class="n">Instance</span><span class="p">.</span><span class="nf">UpdateProgress</span><span class="p">(</span><span class="k">async</span><span class="p">.</span><span class="n">progress</span><span class="p">);</span>
+      <span class="k">yield</span> <span class="k">return</span> <span class="k">null</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="k">if</span> <span class="p">(!</span><span class="kt">string</span><span class="p">.</span><span class="nf">IsNullOrEmpty</span><span class="p">(</span><span class="n">www</span><span class="p">.</span><span class="n">error</span><span class="p">))</span>
+  <span class="p">{</span>
+      <span class="n">NetworkingManager</span><span class="p">.</span><span class="n">Instance</span><span class="p">.</span><span class="nf">ShowNetworkDelayPopup</span><span class="p">();</span>
+  <span class="p">}</span>
+
+  <span class="k">if</span> <span class="p">(!</span><span class="n">Directory</span><span class="p">.</span><span class="nf">Exists</span><span class="p">(</span><span class="n">AssetManager</span><span class="p">.</span><span class="nf">GetContentsAssetDirectory</span><span class="p">()))</span>
+  <span class="p">{</span>
+      <span class="n">Debug</span><span class="p">.</span><span class="nf">Log</span><span class="p">(</span><span class="s">"Not exist directory"</span><span class="p">);</span>
+      <span class="n">Directory</span><span class="p">.</span><span class="nf">CreateDirectory</span><span class="p">(</span><span class="n">AssetManager</span><span class="p">.</span><span class="nf">GetContentsAssetDirectory</span><span class="p">());</span>
+  <span class="p">}</span>
+
+  <span class="kt">string</span> <span class="n">zipFilePath</span> <span class="p">=</span> <span class="n">Path</span><span class="p">.</span><span class="nf">Combine</span><span class="p">(</span><span class="n">AssetManager</span><span class="p">.</span><span class="nf">GetContentsAssetDirectory</span><span class="p">(),</span> <span class="s">"contents.zip"</span><span class="p">);</span>
+
+  <span class="n">File</span><span class="p">.</span><span class="nf">WriteAllBytes</span><span class="p">(</span><span class="n">zipFilePath</span><span class="p">,</span> <span class="n">www</span><span class="p">.</span><span class="n">downloadHandler</span><span class="p">.</span><span class="n">data</span><span class="p">);</span>
+
+  <span class="n">www</span><span class="p">.</span><span class="nf">Dispose</span><span class="p">();</span>
+  <span class="n">www</span> <span class="p">=</span> <span class="k">null</span><span class="p">;</span>
+
+  <span class="n">ZipUtil</span><span class="p">.</span><span class="nf">Unzip</span><span class="p">(</span><span class="n">zipFilePath</span><span class="p">,</span> <span class="n">AssetManager</span><span class="p">.</span><span class="nf">GetContentsAssetDirectory</span><span class="p">());</span>
+
+  <span class="n">File</span><span class="p">.</span><span class="nf">Delete</span><span class="p">(</span><span class="n">zipFilePath</span><span class="p">);</span>
+
+  <span class="n">PlayerPrefs</span><span class="p">.</span><span class="nf">SetInt</span><span class="p">(</span><span class="n">BUNDLE_VERSION</span><span class="p">,</span> <span class="n">currentVersion</span><span class="p">);</span>
+
+  <span class="nf">finishListener</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div>    </div>
+  </li>
+  <li>3D 모델링에 따라말하기 기능 SAL-SA 에셋을 이용해 구현
+    <div class="language-c# highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">void</span> <span class="nf">SetSpeak</span><span class="p">(</span><span class="n">AudioClip</span> <span class="n">clip</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="n">CurrentMode</span> <span class="p">=</span> <span class="n">Mode</span><span class="p">.</span><span class="n">Speak</span><span class="p">;</span>
+  <span class="n">obj_animController</span><span class="p">.</span><span class="nf">playSpeakAnim</span><span class="p">();</span>
+  <span class="n">obj_outputAudio</span><span class="p">.</span><span class="n">clip</span> <span class="p">=</span> <span class="n">clip</span><span class="p">;</span>
+
+  <span class="n">obj_audioSource</span><span class="p">.</span><span class="n">bypassEffects</span> <span class="p">=</span> <span class="k">true</span><span class="p">;</span>
+
+  <span class="n">obj_salsa</span><span class="p">.</span><span class="nf">SetAudioClip</span><span class="p">(</span><span class="n">clip</span><span class="p">);</span>
+  <span class="n">obj_salsa</span><span class="p">.</span><span class="nf">Play</span><span class="p">();</span>
+<span class="p">}</span>
+<span class="n">IEnumerator</span> <span class="nf">waitListening</span><span class="p">()</span>
+<span class="p">{</span>
+  <span class="n">obj_tempAudio</span><span class="p">.</span><span class="n">clip</span> <span class="p">=</span> <span class="n">Microphone</span><span class="p">.</span><span class="nf">Start</span><span class="p">(</span><span class="n">str_microphone</span><span class="p">,</span> <span class="k">true</span><span class="p">,</span> <span class="m">30</span><span class="p">,</span> <span class="n">RECORD_FREQUENCY</span><span class="p">);</span>
+  <span class="k">while</span> <span class="p">(</span><span class="n">Microphone</span><span class="p">.</span><span class="nf">GetPosition</span><span class="p">(</span><span class="n">str_microphone</span><span class="p">)</span> <span class="p">&lt;=</span> <span class="m">0</span><span class="p">)</span> <span class="k">yield</span> <span class="k">return</span> <span class="k">null</span><span class="p">;</span>
+  <span class="n">Debug</span><span class="p">.</span><span class="nf">Log</span><span class="p">(</span><span class="s">"Start record."</span><span class="p">);</span>
+  <span class="n">List</span><span class="p">&lt;</span><span class="kt">float</span><span class="p">[</span><span class="k">]&gt;</span> <span class="n">audioDataList</span> <span class="p">=</span> <span class="k">new</span> <span class="n">List</span><span class="p">&lt;</span><span class="kt">float</span><span class="p">[</span><span class="k">]&gt;</span><span class="p">();</span>
+  <span class="kt">int</span> <span class="n">audioDataLength</span> <span class="p">=</span> <span class="m">0</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">recordEndCounter</span> <span class="p">=</span> <span class="m">0</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">lastPosition</span> <span class="p">=</span> <span class="m">0</span><span class="p">,</span> <span class="n">micPosition</span><span class="p">;</span>
+  <span class="kt">float</span><span class="p">[]</span> <span class="n">audioData</span><span class="p">;</span>
+  <span class="k">while</span> <span class="p">(</span><span class="k">true</span><span class="p">)</span>
+  <span class="p">{</span>
+      <span class="n">micPosition</span> <span class="p">=</span> <span class="n">Microphone</span><span class="p">.</span><span class="nf">GetPosition</span><span class="p">(</span><span class="n">str_microphone</span><span class="p">);</span>
+
+      <span class="kt">int</span> <span class="n">diff</span> <span class="p">=</span> <span class="m">0</span><span class="p">;</span>
+      <span class="k">if</span> <span class="p">(</span><span class="n">micPosition</span> <span class="p">&gt;=</span> <span class="n">lastPosition</span><span class="p">)</span>
+      <span class="p">{</span>
+          <span class="n">diff</span> <span class="p">=</span> <span class="n">micPosition</span> <span class="p">-</span> <span class="n">lastPosition</span><span class="p">;</span>
+          <span class="n">lastPosition</span> <span class="p">=</span> <span class="n">micPosition</span><span class="p">;</span>
+      <span class="p">}</span>
+      <span class="k">else</span>
+      <span class="p">{</span>
+          <span class="n">diff</span> <span class="p">=</span> <span class="n">obj_tempAudio</span><span class="p">.</span><span class="n">clip</span><span class="p">.</span><span class="n">samples</span> <span class="p">-</span> <span class="n">lastPosition</span><span class="p">;</span>
+          <span class="n">lastPosition</span> <span class="p">=</span> <span class="n">diff</span><span class="p">;</span>
+      <span class="p">}</span>
+      <span class="k">if</span> <span class="p">(</span><span class="n">diff</span> <span class="p">&lt;</span> <span class="m">0.0001f</span><span class="p">)</span>
+      <span class="p">{</span>
+          <span class="k">yield</span> <span class="k">return</span> <span class="k">new</span> <span class="nf">WaitForFixedUpdate</span><span class="p">();</span>
+          <span class="k">continue</span><span class="p">;</span>
+      <span class="p">}</span>
+
+      <span class="n">audioData</span> <span class="p">=</span> <span class="k">new</span> <span class="kt">float</span><span class="p">[</span><span class="n">diff</span><span class="p">];</span>
+      <span class="n">obj_tempAudio</span><span class="p">.</span><span class="n">clip</span><span class="p">.</span><span class="nf">GetData</span><span class="p">(</span><span class="n">audioData</span><span class="p">,</span> <span class="n">lastPosition</span> <span class="p">-</span> <span class="n">diff</span><span class="p">);</span>
+
+      <span class="kt">float</span> <span class="n">maxPeak</span> <span class="p">=</span> <span class="m">0</span><span class="p">;</span>
+      <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="p">=</span> <span class="m">0</span><span class="p">;</span> <span class="n">i</span> <span class="p">&lt;</span> <span class="n">audioData</span><span class="p">.</span><span class="n">Length</span><span class="p">;</span> <span class="n">i</span><span class="p">++)</span>
+      <span class="p">{</span>
+          <span class="kt">float</span> <span class="n">peak</span> <span class="p">=</span> <span class="n">audioData</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="p">*</span> <span class="n">audioData</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+          <span class="k">if</span> <span class="p">(</span><span class="n">maxPeak</span> <span class="p">&lt;</span> <span class="n">peak</span><span class="p">)</span> <span class="n">maxPeak</span> <span class="p">=</span> <span class="n">peak</span><span class="p">;</span>
+<span class="cp">#if UNITY_IOS
+</span>          <span class="k">if</span> <span class="p">(</span><span class="n">peak</span> <span class="p">&lt;</span> <span class="m">0.001f</span><span class="p">)</span> <span class="n">audioData</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="p">=</span> <span class="m">0</span><span class="p">;</span>
+<span class="cp">#else
+</span>          <span class="k">if</span> <span class="p">(</span><span class="n">peak</span> <span class="p">&lt;</span> <span class="m">0.005f</span><span class="p">)</span> <span class="n">audioData</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="p">=</span> <span class="m">0</span><span class="p">;</span>
+<span class="cp">#endif
+</span>
+      <span class="p">}</span>
+
+      <span class="k">if</span> <span class="p">(</span><span class="n">CurrentMode</span> <span class="p">==</span> <span class="n">Mode</span><span class="p">.</span><span class="n">Listen</span> <span class="p">||</span> <span class="n">maxPeak</span> <span class="p">&gt;</span> <span class="n">f_listenSensitive</span><span class="p">)</span>
+      <span class="p">{</span>
+          <span class="n">Debug</span><span class="p">.</span><span class="nf">Log</span><span class="p">(</span><span class="s">"Recording..."</span> <span class="p">+</span> <span class="n">maxPeak</span><span class="p">);</span>
+          <span class="n">audioDataList</span><span class="p">.</span><span class="nf">Add</span><span class="p">(</span><span class="n">audioData</span><span class="p">);</span>
+          <span class="n">audioDataLength</span> <span class="p">+=</span> <span class="n">audioData</span><span class="p">.</span><span class="n">Length</span><span class="p">;</span>
+          <span class="k">if</span> <span class="p">(</span><span class="n">CurrentMode</span> <span class="p">!=</span> <span class="n">Mode</span><span class="p">.</span><span class="n">Listen</span><span class="p">)</span>
+          <span class="p">{</span>
+              <span class="nf">SetListen</span><span class="p">();</span>
+          <span class="p">}</span>
+      <span class="p">}</span>
+
+      <span class="c1">// Check recording complete</span>
+      <span class="k">if</span> <span class="p">(</span><span class="n">CurrentMode</span> <span class="p">==</span> <span class="n">Mode</span><span class="p">.</span><span class="n">Listen</span> <span class="p">&amp;&amp;</span> <span class="n">maxPeak</span> <span class="p">&lt;</span> <span class="n">f_listenSensitive</span><span class="p">)</span>
+      <span class="p">{</span>
+
+          <span class="n">recordEndCounter</span><span class="p">++;</span>
+          <span class="k">if</span> <span class="p">(</span><span class="n">recordEndCounter</span> <span class="p">&gt;</span> <span class="n">CUTOFF_COUNT</span><span class="p">)</span>
+          <span class="p">{</span>
+              <span class="n">Debug</span><span class="p">.</span><span class="nf">Log</span><span class="p">(</span><span class="s">"ListenComplete"</span><span class="p">);</span>
+              <span class="n">Microphone</span><span class="p">.</span><span class="nf">End</span><span class="p">(</span><span class="n">str_microphone</span><span class="p">);</span>
+
+              <span class="kt">float</span><span class="p">[]</span> <span class="n">wholeAudio</span> <span class="p">=</span> <span class="k">new</span> <span class="kt">float</span><span class="p">[</span><span class="n">audioDataLength</span><span class="p">];</span>
+              <span class="kt">int</span> <span class="n">pointer</span> <span class="p">=</span> <span class="m">0</span><span class="p">;</span>
+
+              <span class="kt">int</span> <span class="n">dataLength</span> <span class="p">=</span> <span class="n">audioDataList</span><span class="p">.</span><span class="n">Count</span> <span class="p">-</span> <span class="n">CUTOFF_COUNT</span><span class="p">;</span>
+              <span class="k">if</span> <span class="p">(</span><span class="n">audioDataList</span><span class="p">.</span><span class="n">Count</span> <span class="p">&gt;</span> <span class="n">CUTOFF_COUNT</span><span class="p">)</span>
+              <span class="p">{</span>
+                  <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="p">=</span> <span class="m">0</span><span class="p">;</span> <span class="n">i</span> <span class="p">&lt;</span> <span class="n">audioDataList</span><span class="p">.</span><span class="n">Count</span><span class="p">;</span> <span class="n">i</span><span class="p">++)</span>
+                  <span class="p">{</span>
+                      <span class="n">audioDataList</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="nf">CopyTo</span><span class="p">(</span><span class="n">wholeAudio</span><span class="p">,</span> <span class="n">pointer</span><span class="p">);</span>
+                      <span class="n">pointer</span> <span class="p">+=</span> <span class="n">audioDataList</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">Length</span><span class="p">;</span>
+                  <span class="p">}</span>
+                  <span class="nf">SetWait</span><span class="p">();</span>
+                  <span class="k">while</span> <span class="p">(</span><span class="n">b_isShifting</span><span class="p">)</span> <span class="k">yield</span> <span class="k">return</span> <span class="k">null</span><span class="p">;</span>
+
+                  <span class="n">Debug</span><span class="p">.</span><span class="nf">Log</span><span class="p">(</span><span class="s">"Make audio clip "</span> <span class="p">+</span> <span class="n">dataLength</span><span class="p">);</span>
+                  <span class="n">AudioClip</span> <span class="n">clip</span> <span class="p">=</span> <span class="n">AudioClip</span><span class="p">.</span><span class="nf">Create</span><span class="p">(</span><span class="kt">string</span><span class="p">.</span><span class="n">Empty</span><span class="p">,</span> <span class="n">pointer</span><span class="p">,</span> <span class="m">1</span><span class="p">,</span> <span class="n">RECORD_FREQUENCY</span><span class="p">,</span> <span class="k">false</span><span class="p">);</span>
+                  <span class="n">clip</span><span class="p">.</span><span class="nf">SetData</span><span class="p">(</span><span class="n">wholeAudio</span><span class="p">,</span> <span class="m">0</span><span class="p">);</span>
+
+                  <span class="nf">SetSpeak</span><span class="p">(</span><span class="n">clip</span><span class="p">);</span>
+                  <span class="k">yield</span> <span class="k">break</span><span class="p">;</span>
+              <span class="p">}</span>
+
+              <span class="n">Debug</span><span class="p">.</span><span class="nf">Log</span><span class="p">(</span><span class="s">"Not enough length"</span><span class="p">);</span>
+              <span class="n">audioDataList</span><span class="p">.</span><span class="nf">Clear</span><span class="p">();</span>
+              <span class="n">audioDataLength</span> <span class="p">=</span> <span class="m">0</span><span class="p">;</span>
+              <span class="n">recordEndCounter</span> <span class="p">=</span> <span class="m">0</span><span class="p">;</span>
+              <span class="nf">SetIdle</span><span class="p">();</span>
+          <span class="p">}</span>
+      <span class="p">}</span>
+      <span class="k">else</span> <span class="p">{</span> <span class="n">recordEndCounter</span> <span class="p">=</span> <span class="m">0</span><span class="p">;</span> <span class="p">}</span>
+      <span class="k">yield</span> <span class="k">return</span> <span class="k">new</span> <span class="nf">WaitForFixedUpdate</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>    </div>
+  </li>
+  <li>Scratch 에셋을 이용한 색칠하기 컨텐츠 구현
+    <div class="language-c# highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">private</span> <span class="k">void</span> <span class="nf">OnClickBrush</span><span class="p">()</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">enum_brush</span><span class="p">.</span><span class="nf">Equals</span><span class="p">(</span><span class="n">obj_activity</span><span class="p">.</span><span class="nf">GetBrushState</span><span class="p">()))</span>
+  <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="n">b_OnClick</span><span class="p">.</span><span class="nf">Equals</span><span class="p">(</span><span class="k">false</span><span class="p">))</span>
+      <span class="p">{</span>
+          <span class="nf">setBlockBrush</span><span class="p">(</span><span class="k">true</span><span class="p">);</span>
+          <span class="n">ContentsViewManager</span><span class="p">.</span><span class="n">Instance</span><span class="p">.</span><span class="nf">PlaySoundEffect</span><span class="p">(</span><span class="n">SOUND_HOLD</span><span class="p">,</span> <span class="n">OnBrush</span><span class="p">);</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+          <span class="nf">OffBrush</span><span class="p">();</span>
+      <span class="p">}</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="nf">setBlockBrush</span><span class="p">(</span><span class="k">true</span><span class="p">);</span>
+      <span class="nf">WrongBrush</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+<span class="k">void</span> <span class="nf">OnBrush</span><span class="p">()</span> <span class="p">{</span>
+  <span class="n">ContentsViewManager</span><span class="p">.</span><span class="n">Instance</span><span class="p">.</span><span class="nf">PlaySoundEffect</span><span class="p">(</span><span class="n">clip_objectName</span><span class="p">,</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="p">{</span> <span class="nf">setBlockBrush</span><span class="p">(</span><span class="k">false</span><span class="p">);</span> <span class="p">});</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">b_InduceBrush</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">b_InduceBrush</span> <span class="p">=</span> <span class="k">false</span><span class="p">;</span>
+
+      <span class="n">obj_activity</span><span class="p">.</span><span class="nf">StartScratchGuide</span><span class="p">();</span>
+  <span class="p">}</span>
+
+  <span class="n">obj_activity</span><span class="p">.</span><span class="nf">SetCurrentBrush</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+  <span class="n">obj_activity</span><span class="p">.</span><span class="nf">PlayScratch</span><span class="p">();</span>
+
+  <span class="nf">StopInduceBrush</span><span class="p">();</span>
+
+  <span class="n">b_OnClick</span> <span class="p">=</span> <span class="k">true</span><span class="p">;</span>
+  <span class="n">gbj_on</span><span class="p">.</span><span class="nf">SetActive</span><span class="p">(</span><span class="k">true</span><span class="p">);</span>
+  <span class="n">gbj_off</span><span class="p">.</span><span class="nf">SetActive</span><span class="p">(</span><span class="k">false</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>    </div>
+  </li>
+</ul>
+:ET

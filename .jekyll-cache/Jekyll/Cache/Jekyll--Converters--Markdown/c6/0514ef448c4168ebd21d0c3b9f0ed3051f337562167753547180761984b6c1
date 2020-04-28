@@ -1,0 +1,61 @@
+I"�<h3 id="매인-개발">매인 개발</h3>
+<h3 id="주요-기능">주요 기능</h3>
+<ul>
+  <li>Vuforia sdk를 이용한 전집 책 표지 인식 AR기능 구현
+    <div class="language-c# highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">protected</span> <span class="k">virtual</span> <span class="k">void</span> <span class="nf">OnTrackingFound</span><span class="p">()</span>
+<span class="p">{</span>
+  <span class="n">Debug</span><span class="p">.</span><span class="nf">Log</span><span class="p">(</span><span class="s">"Trackable "</span> <span class="p">+</span> <span class="n">mTrackableBehaviour</span><span class="p">.</span><span class="n">TrackableName</span> <span class="p">+</span> <span class="s">" found"</span><span class="p">);</span>
+
+  <span class="kt">string</span><span class="p">[]</span> <span class="n">result</span> <span class="p">=</span> <span class="n">mTrackableBehaviour</span><span class="p">.</span><span class="n">TrackableName</span><span class="p">.</span><span class="nf">Split</span><span class="p">(</span><span class="sc">'_'</span><span class="p">);</span>
+  <span class="n">DataBaseManager</span><span class="p">.</span><span class="n">Instance</span><span class="p">.</span><span class="nf">setNowRecoBookInfo</span><span class="p">(</span><span class="kt">int</span><span class="p">.</span><span class="nf">Parse</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="m">1</span><span class="p">]));</span>
+  <span class="n">SceneManager</span><span class="p">.</span><span class="n">Instance</span><span class="p">.</span><span class="nf">loadLearningScene</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div>    </div>
+  </li>
+  <li>러닝게임 구현
+    <div class="language-c# highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">void</span> <span class="nf">showQuizPanel</span><span class="p">()</span>
+<span class="p">{</span>
+  <span class="n">f_QuizPanelOriginPosY</span> <span class="p">=</span> <span class="n">tf_QuizPanel</span><span class="p">.</span><span class="n">localPosition</span><span class="p">.</span><span class="n">y</span><span class="p">;</span>
+
+  <span class="n">tf_QuizPanel</span><span class="p">.</span><span class="nf">DOLocalMoveY</span><span class="p">(</span><span class="n">tf_QuizPanelPoint</span><span class="p">.</span><span class="n">localPosition</span><span class="p">.</span><span class="n">y</span><span class="p">,</span> <span class="m">0.8f</span><span class="p">).</span><span class="nf">SetEase</span><span class="p">(</span><span class="n">Ease</span><span class="p">.</span><span class="n">OutBack</span><span class="p">).</span><span class="nf">SetDelay</span><span class="p">(</span><span class="m">1</span><span class="p">).</span><span class="nf">OnComplete</span><span class="p">(</span><span class="n">hideQuizPanel</span><span class="p">);</span>
+
+  <span class="nf">StartCoroutine</span><span class="p">(</span><span class="nf">playQuizImgEngAudio</span><span class="p">());</span>
+
+  <span class="nf">addLearningCount</span><span class="p">();</span>
+<span class="p">}</span>
+<span class="k">void</span> <span class="nf">settingInGame</span><span class="p">()</span>
+<span class="p">{</span>
+  <span class="n">i_quizRandVal</span> <span class="p">=</span> <span class="n">RungameDBManager</span><span class="p">.</span><span class="n">Instance</span><span class="p">.</span><span class="nf">setRandomValueQuizList</span><span class="p">();</span>
+  <span class="n">RungameDBManager</span><span class="p">.</span><span class="n">Instance</span><span class="p">.</span><span class="nf">setQuizResources</span><span class="p">(</span><span class="n">i_quizRandVal</span><span class="p">);</span>
+
+  <span class="n">BackgroundManager</span><span class="p">.</span><span class="n">Instance</span><span class="p">.</span><span class="nf">playQuiz</span><span class="p">();</span>
+  <span class="n">SpawnManager</span><span class="p">.</span><span class="n">Instance</span><span class="p">.</span><span class="nf">settingSpawnQuiz</span><span class="p">();</span>
+<span class="p">}</span>
+<span class="k">private</span> <span class="k">void</span> <span class="nf">settingQuiz</span><span class="p">()</span>
+<span class="p">{</span>
+  <span class="n">isFinish</span> <span class="p">=</span> <span class="k">false</span><span class="p">;</span>
+
+  <span class="n">InGameManager</span><span class="p">.</span><span class="n">Instance</span><span class="p">.</span><span class="nf">setQuizRandomImage</span><span class="p">();</span>
+
+  <span class="n">list_QuizPlayPos</span> <span class="p">=</span> <span class="k">new</span> <span class="n">List</span><span class="p">&lt;</span><span class="n">Transform</span><span class="p">&gt;(</span><span class="n">list_ItemSpawnPosition</span><span class="p">);</span>
+  <span class="n">list_QuizPlayObj</span> <span class="p">=</span> <span class="k">new</span> <span class="n">List</span><span class="p">&lt;</span><span class="n">GameObject</span><span class="p">&gt;();</span>
+
+  <span class="n">i_selectQuizNum</span> <span class="p">=</span> <span class="n">InGameManager</span><span class="p">.</span><span class="n">Instance</span><span class="p">.</span><span class="nf">getQuizRandomValue</span><span class="p">();</span>
+  <span class="n">s_QuizAnswer</span> <span class="p">=</span> <span class="n">RungameDBManager</span><span class="p">.</span><span class="n">Instance</span><span class="p">.</span><span class="nf">getRungameQuizListString</span><span class="p">()[</span><span class="n">i_selectQuizNum</span><span class="p">];</span>
+
+  <span class="n">suffleListObj</span><span class="p">&lt;</span><span class="n">QuizCard</span><span class="p">&gt;(</span><span class="n">list_Quiz</span><span class="p">);</span>
+  <span class="n">list_Quiz</span><span class="p">[</span><span class="m">0</span><span class="p">].</span><span class="nf">setQuizText</span><span class="p">(</span><span class="n">s_QuizAnswer</span><span class="p">);</span>
+
+  <span class="kt">int</span> <span class="n">selectQuizListNum</span> <span class="p">=</span> <span class="n">Random</span><span class="p">.</span><span class="nf">Range</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="m">3</span><span class="p">);</span>
+
+  <span class="n">list_Quiz</span><span class="p">[</span><span class="m">0</span><span class="p">].</span><span class="n">enum_quizState</span> <span class="p">=</span> <span class="n">QuizCard</span><span class="p">.</span><span class="n">QuizState</span><span class="p">.</span><span class="n">COLLECT</span><span class="p">;</span>
+  <span class="n">list_QuizPlayObj</span><span class="p">.</span><span class="nf">Add</span><span class="p">(</span><span class="n">list_Quiz</span><span class="p">[</span><span class="m">0</span><span class="p">].</span><span class="n">gameObject</span><span class="p">);</span>
+
+  <span class="nf">settingQuizSpawnObj</span><span class="p">();</span>
+
+  <span class="n">InGameManager</span><span class="p">.</span><span class="n">Instance</span><span class="p">.</span><span class="nf">showQuizPanel</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div>    </div>
+  </li>
+</ul>
+:ET

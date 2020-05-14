@@ -1,0 +1,54 @@
+I"�<h3 id="메인-개발">메인 개발</h3>
+<h3 id="주요-기능">주요 기능</h3>
+<ul>
+  <li>Timeline 기능으로 애니메이션 구현</li>
+  <li>서버 통신을 통해 데이터 연동
+    <div class="language-c# highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">IEnumerator</span> <span class="nf">Co_OnLoadChildList</span><span class="p">()</span>
+<span class="p">{</span>
+  <span class="n">WWWForm</span> <span class="n">form</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">WWWForm</span><span class="p">();</span>
+
+  <span class="n">UnityWebRequest</span> <span class="n">request</span> <span class="p">=</span> <span class="n">UnityWebRequest</span><span class="p">.</span><span class="nf">Post</span><span class="p">(</span><span class="n">CHILD_LIST_DEV</span><span class="p">,</span> <span class="n">form</span><span class="p">);</span>
+  <span class="n">request</span><span class="p">.</span><span class="nf">SetRequestHeader</span><span class="p">(</span><span class="s">"appName"</span><span class="p">,</span> <span class="n">Application</span><span class="p">.</span><span class="n">productName</span><span class="p">);</span>
+  <span class="n">request</span><span class="p">.</span><span class="nf">SetRequestHeader</span><span class="p">(</span><span class="s">"appVer"</span><span class="p">,</span> <span class="s">"1"</span><span class="p">);</span>
+  <span class="n">request</span><span class="p">.</span><span class="nf">SetRequestHeader</span><span class="p">(</span><span class="s">"authToken"</span><span class="p">,</span> <span class="s">"1"</span><span class="p">);</span>
+  <span class="n">request</span><span class="p">.</span><span class="nf">SetRequestHeader</span><span class="p">(</span><span class="s">"deviceSN"</span><span class="p">,</span> <span class="s">"1"</span><span class="p">);</span>
+
+  <span class="k">yield</span> <span class="k">return</span> <span class="n">request</span><span class="p">.</span><span class="nf">SendWebRequest</span><span class="p">();</span>
+
+  <span class="k">if</span> <span class="p">(</span><span class="n">request</span><span class="p">.</span><span class="n">isNetworkError</span> <span class="p">||</span> <span class="n">request</span><span class="p">.</span><span class="n">isHttpError</span><span class="p">)</span>
+  <span class="p">{</span>
+      <span class="n">Debug</span><span class="p">.</span><span class="nf">Log</span><span class="p">(</span><span class="n">request</span><span class="p">.</span><span class="n">error</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="k">else</span>
+  <span class="p">{</span>
+      <span class="n">JsonData</span> <span class="n">_data</span> <span class="p">=</span> <span class="n">JsonMapper</span><span class="p">.</span><span class="nf">ToObject</span><span class="p">(</span><span class="n">request</span><span class="p">.</span><span class="n">downloadHandler</span><span class="p">.</span><span class="n">text</span><span class="p">);</span>
+      <span class="kt">int</span> <span class="n">_listCount</span> <span class="p">=</span> <span class="n">_data</span><span class="p">[</span><span class="s">"resultData"</span><span class="p">].</span><span class="n">Count</span><span class="p">;</span>
+
+      <span class="k">if</span> <span class="p">(</span><span class="n">_listCount</span> <span class="p">&gt;</span> <span class="m">0</span><span class="p">)</span>
+      <span class="p">{</span>
+          <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="p">=</span> <span class="m">0</span><span class="p">;</span> <span class="n">i</span> <span class="p">&lt;</span> <span class="n">_data</span><span class="p">[</span><span class="s">"resultData"</span><span class="p">].</span><span class="n">Count</span><span class="p">;</span> <span class="p">++</span><span class="n">i</span><span class="p">)</span>
+          <span class="p">{</span>
+              <span class="n">Child</span> <span class="n">_child</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">Child</span><span class="p">();</span>
+              <span class="n">_child</span><span class="p">.</span><span class="n">childData</span> <span class="p">=</span> <span class="p">(</span><span class="kt">string</span><span class="p">)</span><span class="n">_data</span><span class="p">[</span><span class="s">"resultData"</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s">"childData"</span><span class="p">];</span>
+              <span class="n">_child</span><span class="p">.</span><span class="n">userId</span> <span class="p">=</span> <span class="p">(</span><span class="kt">string</span><span class="p">)</span><span class="n">_data</span><span class="p">[</span><span class="s">"resultData"</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s">"userId"</span><span class="p">];</span>
+              <span class="n">_child</span><span class="p">.</span><span class="n">userNm</span> <span class="p">=</span> <span class="p">(</span><span class="kt">string</span><span class="p">)</span><span class="n">_data</span><span class="p">[</span><span class="s">"resultData"</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s">"userNm"</span><span class="p">];</span>
+              <span class="k">if</span> <span class="p">(</span><span class="n">_data</span><span class="p">[</span><span class="s">"resultData"</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s">"classNum"</span><span class="p">]</span> <span class="p">!=</span> <span class="k">null</span><span class="p">)</span>
+              <span class="p">{</span>
+                  <span class="n">_child</span><span class="p">.</span><span class="n">classNum</span> <span class="p">=</span> <span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="n">_data</span><span class="p">[</span><span class="s">"resultData"</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s">"classNum"</span><span class="p">];</span>
+              <span class="p">}</span> <span class="k">else</span>
+              <span class="p">{</span>
+                  <span class="n">_child</span><span class="p">.</span><span class="n">classNum</span> <span class="p">=</span> <span class="m">0</span><span class="p">;</span>
+              <span class="p">}</span>
+              <span class="n">_child</span><span class="p">.</span><span class="n">schoolyearNo</span> <span class="p">=</span> <span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="n">_data</span><span class="p">[</span><span class="s">"resultData"</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s">"schoolyearNo"</span><span class="p">];</span>
+              <span class="n">_child</span><span class="p">.</span><span class="n">classJoinStatus</span> <span class="p">=</span> <span class="p">(</span><span class="kt">string</span><span class="p">)</span><span class="n">_data</span><span class="p">[</span><span class="s">"resultData"</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s">"classJoinStatus"</span><span class="p">];</span>
+
+              <span class="n">list_children</span><span class="p">.</span><span class="nf">Add</span><span class="p">(</span><span class="n">_child</span><span class="p">);</span>
+          <span class="p">}</span>
+      <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+:ET
